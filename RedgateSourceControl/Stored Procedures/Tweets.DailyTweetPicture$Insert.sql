@@ -5,7 +5,8 @@ GO
 
 
 
-CREATE     PROCEDURE [Tweets].[DailyTweetPicture$Insert](
+
+CREATE      PROCEDURE [Tweets].[DailyTweetPicture$Insert](
 	@TweetDate date,
 	@TweetTypeTag varchar(30),
 	@TweetNumber int = 1,
@@ -80,7 +81,7 @@ INSERT INTO FileAssets.DailyTweetMedia(stream_id,
                                    is_temporary)
 SELECT NEWID(),
                                    file_stream,
-                                   CAST(@TweetDate AS varchar(10)) + '_' + CASE WHEN @PictureSuffix <> '' THEN @PictureSuffix + '_' ELSE '' END + PictureDecoded.PictureNumber + '.jpg',
+                                   CAST(@TweetDate AS varchar(10)) + '_' + CASE WHEN @PictureSuffix <> '' THEN REPLACE(REPLACE(@TweetTypeTag,'{',''),'}','') + '_' ELSE '' END + PictureDecoded.PictureNumber + '.jpg',
                                    @PathLocator ,
                                    creation_time,
                                    last_write_time,

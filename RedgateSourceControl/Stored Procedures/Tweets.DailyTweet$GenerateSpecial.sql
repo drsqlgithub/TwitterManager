@@ -5,8 +5,10 @@ GO
 
 
 
+
+
 	
-CREATE    PROCEDURE [Tweets].[DailyTweet$GenerateSpecial]
+CREATE      PROCEDURE [Tweets].[DailyTweet$GenerateSpecial]
 (
 	@TweetTypeTag varchar(30),
 	@TweetDate date = NULL,
@@ -21,11 +23,9 @@ IF @TweetTypeTag = 'FollowFriday'
 
 IF @TweetDate IS NULL SET @TweetDate = SYSDATETIME();
 
-DECLARE @TweetTypeTagFormat varchar(30) = '{' + @TweetTypeTag + '}'
-
 IF NOT EXISTS (SELECT *
 			   FROM   Assets.Tag
-			   WHERE  Tag.tag = @TweetTypeTagFormat
+			   WHERE  Tag.tag = @TweetTypeTag
 			     AND  Tag.SpecialFlag = 1)
  THROW 50000,'Only special tags are allowed to be used for a DailyTweet',1;
  
@@ -34,7 +34,7 @@ BEGIN TRANSACTION;'
 
 --generate statements to get pictures and create the directories for the images
 SELECT '--#' + @TweetTypeTag + ' [--Topic], ' + 
-			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE Tweets.DailyTweet$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''' + @TweetTypeTagFormat  +  ''',' + CHAR(13) + CHAR(10) + '@TweetText = '' #' + @TweetTypeTag + ''';'
+			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE Tweets.DailyTweet$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''' + @TweetTypeTag  +  ''',' + CHAR(13) + CHAR(10) + '@TweetText = '' #' + REPLACE(REPLACE(@TweetTypeTag,'{',''),'}','') + ''';'
 
 EXEC Tweets.DailyTweetPicture$GetRandomSpecial @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount, @TweetTypeTag = @TweetTypeTag
 

@@ -8,7 +8,8 @@ GO
 
 
 
-CREATE   PROCEDURE [Tweets].[DailyTweetPicture$GetRandomSpecial] 
+
+CREATE    PROCEDURE [Tweets].[DailyTweetPicture$GetRandomSpecial] 
 (
 	@TweetTypeTag varchar(30),
 	@TweetDate date = NULL,
@@ -68,7 +69,7 @@ WHERE  Picture.PictureId NOT IN (SELECT DailyTweetPicture.PictureId
 								WHERE Tag.HolidayTag = 1) 
 			OR @IncludeHolidayPicturesFlag = 1)
 
-  AND  SpecialPicture.SpecialTag = '{' + @TweetTypeTag + '}'
+  AND  SpecialPicture.SpecialTag = @TweetTypeTag 
 ORDER BY NEWID();
 
 SELECT CONCAT('EXEC Tweets.DailyTweetPicture$Insert @TweetDate = ''',@TweetDate,''', @TweetTypeTag = ''' +  @TweetTypeTag + ''', @TweetNumber = ' + CAST(@TweetNumber AS varchar(10)) + ',@PictureNumber = ''',PictureDecoded.PictureNumber, '''')
