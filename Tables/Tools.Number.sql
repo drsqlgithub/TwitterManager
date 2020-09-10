@@ -1,0 +1,7 @@
+CREATE TABLE [Tools].[Number]
+(
+[I] [int] NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [Tools].[Number] ADD CONSTRAINT [PKNumber] PRIMARY KEY CLUSTERED  ([I]) ON [PRIMARY]
+GO

@@ -1,0 +1,3 @@
+CREATE SCHEMA [AssetsInterface]
+AUTHORIZATION [dbo]
+GO

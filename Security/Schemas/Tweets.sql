@@ -1,0 +1,3 @@
+CREATE SCHEMA [Tweets]
+AUTHORIZATION [dbo]
+GO

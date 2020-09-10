@@ -1,0 +1,3 @@
+CREATE SCHEMA [FileAssets]
+AUTHORIZATION [dbo]
+GO
