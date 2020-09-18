@@ -4,7 +4,8 @@ SET ANSI_NULLS ON
 GO
 
 
-CREATE    FUNCTION [Assets].[ThemeParkAsset$RandomBaseNormal](@DateValue date)
+
+CREATE     FUNCTION [Assets].[ThemeParkAsset$RandomBaseNormal](@DateValue date)
 RETURNS table AS 
 RETURN(
 SELECT Value.ThemeParkAssetId,
@@ -24,7 +25,7 @@ FROM (
 					  FROM   Tweets.DailyTweet	
 								JOIN Tweets.DailyTweetNormal
 									ON DailyTweetNormal.DailyTweetId = DailyTweet.DailyTweetId
-					  WHERE  DailyTweet.TweetDate < DATEADD(DAY,-30,@DateValue)
+					  WHERE  DailyTweet.TweetDate > DATEADD(DAY,-30,@DateValue)
 					    AND  DailyTweetNormal.ThemeParkAssetId = ItemsAdded.ThemeParkAssetId)
 ) AS Value
 )

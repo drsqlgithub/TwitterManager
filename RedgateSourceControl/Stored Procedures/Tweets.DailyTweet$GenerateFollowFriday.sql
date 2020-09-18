@@ -4,7 +4,8 @@ SET ANSI_NULLS ON
 GO
 
 
-CREATE     PROCEDURE [Tweets].[DailyTweet$GenerateFollowFriday]
+
+CREATE   PROCEDURE [Tweets].[DailyTweet$GenerateFollowFriday]
 (
 	@TweetDate date,
 	@AllowNonFridayDateFlag bit = 0,
@@ -120,7 +121,7 @@ DECLARE @position INT = 1, @TwitterAccountId int, @CurrentLength tinyint, @NewIt
   GROUP BY #holdMessages.messageText,#holdAccountNames.Position, #holdMessages.followFridayPrefixId
   ORDER BY #holdAccountNames.position
   
-  EXEC [Tweets].[DailyTweetPicture$GetRandomSpecial] @TweetTypeTag = 'FollowFriday', @TweetDate = @TweetDate,@TweetNumber = 10
+  EXEC [Tweets].[DailyTweetPicture$GetRandomSpecial] @TweetTypeTag = '{FollowFriday}', @TweetDate = @TweetDate,@TweetNumber = 10
 	
 
 
