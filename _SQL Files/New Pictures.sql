@@ -18,12 +18,3 @@ Assets.Picture$MakeDetailsMatchFileAssets
 
 
 
-SELECT Picture.PictureId,
-       Picture.PictureNumber,
-       Picture.ThemeParkAssetId,
-       Picture.Year,
-       Picture.RowRecoveryPhysicalFileName,
-	   row_number() OVER (PARTITION BY PictureNumber  ORDER BY Pictureid) AS RowNumber
-INTO #holdRows
-FROM   assets.Picture
-

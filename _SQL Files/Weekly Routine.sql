@@ -1,9 +1,9 @@
-USE 
+USE TwitterManager
 EXIT
 --Sunday
 
 --SpaceshipEarthSunday
-DECLARE @TweetDate date = Tools.[Date$GetNthDay]('Sunday',0,DEFAULT);
+DECLARE @TweetDate date = Tools.[Date$GetNthDay]('Sunday',1,DEFAULT);
 EXEC TwitterManager.[Tweets].[DailyTweet$GenerateSpecial] @TweetTypeTag = '{SpaceshipEarthSunday}', @TweetDate=@TweetDate;
 
 --Normal (Optional)
@@ -60,3 +60,9 @@ EXEC [Tweets].[DailyTweet$GenerateFollowFriday]  @TweetDate=@TweetDate, @NumberO
 DECLARE @TweetDate date = Tools.[Date$GetNthDay]('Saturday',0,DEFAULT)
 EXEC [Tweets].[DailyTweet$GenerateNormal]  @TweetDate=@TweetDate;
 
+
+
+------------------------------------------------
+--Getting a specific item
+DECLARE @TweetDate date = '2020-10-05'
+EXEC [Tweets].[DailyTweet$GenerateSpecific] @ThemeParkAreaHashTag = 'MagicKingdom', @ThemeParkAssetHashTag = 'BuzzLightyearsSpaceRangerSpin', @TweetDate = @TweetDate

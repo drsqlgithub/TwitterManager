@@ -65,6 +65,3 @@ GROUP BY ThemeParkArea.ThemeParkAreaHashtag, ThemeParkAsset.ThemeParkAssetHashta
 HAVING SUM(CASE WHEN pictureId IS NULL THEN 0 ELSE 1 END) <6
 ORDER BY 1,2, PictureCount ASC
 
-Fix:
-dinoland
-dinolandarea
