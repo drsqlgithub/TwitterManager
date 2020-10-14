@@ -63,5 +63,15 @@ FROM   Assets.ThemeParkAsset
 		ON ThemeParkAsset.ThemeParkAssetId = Picture.ThemeParkAssetId 
 GROUP BY ThemeParkArea.ThemeParkAreaHashtag, ThemeParkAsset.ThemeParkAssetHashtag
 HAVING SUM(CASE WHEN pictureId IS NULL THEN 0 ELSE 1 END) <6
-ORDER BY 1,2, PictureCount ASC
+ORDER BY PictureCount desc
 
+GO
+
+SELECT ThemeParkAreaHashtag,ThemeParkAssetHashtag,COUNT(*) AS PictureCount
+FROM   Assets.Picture
+		JOIN Assets.ThemeParkAsset
+			ON ThemeParkAsset.ThemeParkAssetId = Picture.ThemeParkAssetId
+		JOIN Assets.ThemeParkArea
+			ON ThemeParkArea.ThemeParkAreaId = ThemeParkAsset.ThemeParkAreaId
+GROUP BY ThemeParkAreaHashtag,ThemeParkAssetHashtag
+ORDER BY 3 desc

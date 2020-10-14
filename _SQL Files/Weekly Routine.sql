@@ -1,4 +1,5 @@
 USE TwitterManager
+GO
 EXIT
 --Sunday
 
@@ -64,5 +65,5 @@ EXEC [Tweets].[DailyTweet$GenerateNormal]  @TweetDate=@TweetDate;
 
 ------------------------------------------------
 --Getting a specific item
-DECLARE @TweetDate date = '2020-10-05'
-EXEC [Tweets].[DailyTweet$GenerateSpecific] @ThemeParkAreaHashTag = 'MagicKingdom', @ThemeParkAssetHashTag = 'BuzzLightyearsSpaceRangerSpin', @TweetDate = @TweetDate
+DECLARE @TweetDate date = '2020-10-08'
+EXEC [Tweets].[DailyTweet$GenerateSpecific] @ThemeParkAreaHashTag = 'HollywoodStudios', @ThemeParkAssetHashTag = 'TwilightZoneTowerOfTerror', @TweetDate = @TweetDate, @FileSampleCount = 70
