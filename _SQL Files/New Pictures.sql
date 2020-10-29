@@ -8,7 +8,7 @@ EXIT
 EXEC FileAssets.Picture$AddPictureNumber;
 
 
-
+EXIT
 --copy files for fixing to the FixImages folder
 FileAssets.PictureInvalidImage$CopyToFix
 

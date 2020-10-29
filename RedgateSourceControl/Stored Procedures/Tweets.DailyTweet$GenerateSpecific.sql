@@ -10,7 +10,8 @@ GO
 
 
 
-CREATE PROCEDURE [Tweets].[DailyTweet$GenerateSpecific]
+
+CREATE   PROCEDURE [Tweets].[DailyTweet$GenerateSpecific]
 (
 	@ThemeParkAreaHashtag varchar(100),
 	@ThemeParkAssetHashtag varchar(100),
@@ -38,7 +39,7 @@ IF @ThemeParkAssetId IS NULL
 
 --generate statements to get pictures and create the directories for the images
 SELECT '--#' + ThemeParkAssetHashtag + ' at #' + ThemeParkAreaHashtag AS [--TweetTextHelper], 
-			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE Tweets.DailyTweet$Insert @ThemeParkAssetId = ' + CAST(ThemeParkAssetId AS varchar(10)) + 
+			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE ' + DB_NAME() + '.Tweets.DailyTweet$Insert @ThemeParkAssetId = ' + CAST(ThemeParkAssetId AS varchar(10)) + 
 			', @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''Normal'',' + CHAR(13) + CHAR(10) + '@TweetText = ''Here''''s a picture of #' + ThemeParkAssetHashtag + ' at #' + ThemeParkAreaHashtag + ''';'
 FROM Assets.ThemeParkAsset
 		JOIN Assets.ThemeParkArea
@@ -52,7 +53,7 @@ EXEC Tweets.DailyTweetPicture$GetRandomNormal @ThemeParkAssetId = @ThemeParkAsse
 SELECT '--COMMIT TRANSACTION;'
 
 SELECT 'SELECT DailyTweet.TweetText
-FROM   Tweets.DailyTweet
+FROM   ' + DB_NAME() + '.Tweets.DailyTweet
 WHERE  TweetDate = ''' + CAST(@TweetDate AS nvarchar(20)) + ''''
 
 GO

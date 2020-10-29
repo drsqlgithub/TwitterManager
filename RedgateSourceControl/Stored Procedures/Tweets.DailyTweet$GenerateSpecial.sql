@@ -7,12 +7,16 @@ GO
 
 
 
+
+
+
 	
-CREATE      PROCEDURE [Tweets].[DailyTweet$GenerateSpecial]
+CREATE     PROCEDURE [Tweets].[DailyTweet$GenerateSpecial]
 (
 	@TweetTypeTag varchar(30),
 	@TweetDate date = NULL,
-	@FileSampleCount int = 4
+	@FileSampleCount int = 4,
+	@IncludeHolidayPicturesFlag bit = 0
 )
 AS
 
@@ -28,20 +32,27 @@ IF NOT EXISTS (SELECT *
 			   WHERE  Tag.tag = @TweetTypeTag
 			     AND  Tag.SpecialFlag = 1)
  THROW 50000,'Only special tags are allowed to be used for a DailyTweet',1;
+
+IF  EXISTS (SELECT *
+			   FROM   Assets.Tag
+			   WHERE  Tag.tag = @TweetTypeTag
+			     AND  Tag.HolidayTag = 1
+				 AND  @IncludeHolidayPicturesFlag =  0)
+ THROW 50000,'Cannot use a holiday tag with parameter @IncludeHolidayPicturesFlag = 0',1;
  
 SELECT 'SET XACT_ABORT ON; 
 BEGIN TRANSACTION;'
 
 --generate statements to get pictures and create the directories for the images
 SELECT '--#' + @TweetTypeTag + ' [--Topic], ' + 
-			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE Tweets.DailyTweet$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''' + @TweetTypeTag  +  ''',' + CHAR(13) + CHAR(10) + '@TweetText = '' #' + REPLACE(REPLACE(@TweetTypeTag,'{',''),'}','') + ''';'
+			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE ' + DB_NAME() + '.Tweets.DailyTweet$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''' + @TweetTypeTag  +  ''',' + CHAR(13) + CHAR(10) + '@TweetText = '' #' + REPLACE(REPLACE(@TweetTypeTag,'{',''),'}','') + ''';'
 
-EXEC Tweets.DailyTweetPicture$GetRandomSpecial @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount, @TweetTypeTag = @TweetTypeTag
+EXEC Tweets.DailyTweetPicture$GetRandomSpecial @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount, @TweetTypeTag = @TweetTypeTag, @IncludeHolidayPicturesFlag = @IncludeHolidayPicturesFlag
 
 SELECT '--COMMIT TRANSACTION;'
 
 SELECT 'SELECT DailyTweet.TweetText
-FROM   Tweets.DailyTweet
+FROM   ' + DB_NAME() + '.Tweets.DailyTweet
 WHERE  TweetDate = ''' + CAST(@TweetDate AS nvarchar(20)) + ''''
 
 GO

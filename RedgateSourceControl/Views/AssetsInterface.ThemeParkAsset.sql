@@ -25,6 +25,24 @@ SET ANSI_NULLS ON
 GO
 
 
+CREATE   TRIGGER [AssetsInterface].[ThemeParkAsset$Delete]
+ON [AssetsInterface].[ThemeParkAsset]
+INSTEAD OF DELETE
+AS 
+BEGIN
+	SET NOCOUNT ON;
+
+	DELETE FROM Assets.ThemeParkAsset
+	WHERE  ThemeParkAsset.ThemeParkAssetId IN (SELECT ThemeParkAssetId FROM Deleted);
+	
+ END;
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+
 CREATE   TRIGGER [AssetsInterface].[ThemeParkAsset$Insert]
 ON [AssetsInterface].[ThemeParkAsset]
 INSTEAD OF INSERT

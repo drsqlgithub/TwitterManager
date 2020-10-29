@@ -3,21 +3,52 @@ GO
 SET ANSI_NULLS ON
 GO
 
-CREATE    PROCEDURE [Tweets].[DailyTweet$Insert](
+
+CREATE      PROCEDURE [Tweets].[DailyTweet$Insert](
 	@TweetDate date,
 	@TweetTypeTag varchar(30),
 	@TweetText nvarchar(280),
 	@TweetNumber int = 1,
 	@ThemeParkAssetId nvarchar(50) = NULL,
 	@FollowFridayPrefixId int = NULL,
-	@FollowFridayList nvarchar(MAX) = NULL
+	@FollowFridayList nvarchar(MAX) = NULL,
+	@OverrideDailyLimitFlag int = 0
 )
 AS
+SET NOCOUNT ON;
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
 
-DECLARE @DailyTweetId int;
+DECLARE @DailyTweetId int, @msg nvarchar(2000);
 DECLARE @TweetTypeTagId int = (SELECT TagId FROM Assets.Tag WHERE Tag = @TweetTypeTag);
+
+DECLARE @TagUseCount int;
+DECLARE @MaxTagUseCount int;
+
+SELECT @TagUseCount = COUNT(*)
+FROM   Tweets.DailyTweet
+		JOIN Assets.Tag
+		ON DailyTweet.TweetTypeTagId = Tag.TagId
+WHERE  DailyTweet.TweetTypeTagId = @TweetTypeTagId
+  AND  DailyTweet.TweetDate = @TweetDate
+
+SELECT @MaxTagUseCount = Tag.MaxDailyUseCount
+FROM   Assets.Tag
+WHERE  Tag.TagId = @TweetTypeTagId
+
+IF @TagUseCount >= @MaxTagUseCount
+  BEGIN
+	IF @OverrideDailyLimitFlag = 0
+	  BEGIN
+		SET @msg = CONCAT('The maximum limit of uses for the ', @TweetTypeTag,' is ',@MaxTagUseCount,' and this tag has been used ',@TagUseCount,' times. Use @OverrideDailyLimitFlag parameter to continue');
+		THROW 50000, @msg,1;
+	  END
+	ELSE 
+	  BEGIN
+		SET @msg = CONCAT('@OverrideDailyLimitFlag parameter used. The maximum limit of uses for the ', @TweetTypeTag,' is ',@MaxTagUseCount,' and this tag has been used ',@TagUseCount,' times.');
+		PRINT @msg;
+	  END;
+  END;
 
 
 INSERT INTO Tweets.DailyTweet(TweetDate, TweetNumber, TweetText, TweetTypeTagId)

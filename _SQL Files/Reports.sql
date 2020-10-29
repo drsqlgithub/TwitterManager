@@ -75,3 +75,4 @@ FROM   Assets.Picture
 			ON ThemeParkArea.ThemeParkAreaId = ThemeParkAsset.ThemeParkAreaId
 GROUP BY ThemeParkAreaHashtag,ThemeParkAssetHashtag
 ORDER BY 3 desc
+

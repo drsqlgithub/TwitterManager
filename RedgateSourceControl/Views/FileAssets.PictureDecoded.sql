@@ -5,7 +5,8 @@ GO
 
 
 
-CREATE     VIEW [FileAssets].[PictureDecoded]
+
+CREATE       VIEW [FileAssets].[PictureDecoded]
 AS
 WITH Decoded AS (
 SELECT Tools.String$SplitPart(name, '_',1) AS Year,
@@ -19,11 +20,13 @@ WHERE  name NOT IN ('desktop.ini')
 )
 SELECT Decoded.*, ThemeParkAsset.ThemeParkAssetId, ThemeParkArea.ThemeParkAreaId,
 	   CONCAT(
-		CASE WHEN Decoded.PhysicalFileName LIKE  '%~_ %' ESCAPE '~' THEN 'SpaceAfter _' END + ';', 
-		CASE WHEN Decoded.PhysicalFileName NOT LIKE  '%~_%~_%~_%~_%' ESCAPE '~' THEN 'Wrong Number Of _' END + ';',
-		CASE WHEN Decoded.PictureNumber IS NULL THEN 'No Picture Number' END + ';',
-		CASE WHEN ThemeParkAsset.ThemeParkAssetId IS NULL THEN 'No Asset' END + ';',
-		CASE WHEN ThemeParkArea.ThemeParkAreaId IS NULL THEN 'No Area' END + ';'
+		CASE WHEN Decoded.PhysicalFileName LIKE  '%~_ %' ESCAPE '~' THEN 'SpaceAfter _;' END, 
+		CASE WHEN Decoded.PhysicalFileName NOT LIKE  '%~_%~_%~_%~_%' ESCAPE '~' THEN 'Wrong Number Of _;' END,
+		CASE WHEN Decoded.PictureNumber IS NULL THEN 'No Picture Number;' END,
+		CASE WHEN LEN(Decoded.PictureNumber) <> 10 THEN 'Invalid Picture Number Format;' END,
+		CASE WHEN ThemeParkAsset.ThemeParkAssetId IS NULL THEN 'No Asset;' END,
+		CASE WHEN ThemeParkArea.ThemeParkAreaId IS NULL THEN 'No Area;' END,
+		CASE WHEN LEN(Decoded.PhysicalFileName) - 4 <> LEN(REPLACE(Decoded.PhysicalFileName,'_','')) THEN 'Wrong Number Of _;'  END
 		) AS DataIssues
 FROM   Decoded
 		LEFT JOIN Assets.ThemeParkArea
