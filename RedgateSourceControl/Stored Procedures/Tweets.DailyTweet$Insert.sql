@@ -4,10 +4,11 @@ SET ANSI_NULLS ON
 GO
 
 
-CREATE      PROCEDURE [Tweets].[DailyTweet$Insert](
+
+CREATE        PROCEDURE [Tweets].[DailyTweet$Insert](
 	@TweetDate date,
 	@TweetTypeTag varchar(30),
-	@TweetText nvarchar(280),
+	@TweetText nvarchar(2000),
 	@TweetNumber int = 1,
 	@ThemeParkAssetId nvarchar(50) = NULL,
 	@FollowFridayPrefixId int = NULL,
@@ -19,8 +20,16 @@ SET NOCOUNT ON;
 SET XACT_ABORT ON;
 BEGIN TRANSACTION;
 
+DECLARE @LenTweetText int = LEN(@TweetText)
 DECLARE @DailyTweetId int, @msg nvarchar(2000);
 DECLARE @TweetTypeTagId int = (SELECT TagId FROM Assets.Tag WHERE Tag = @TweetTypeTag);
+
+
+IF  @LenTweetText > 280
+ BEGIN
+	SET @msg = 'The value of @TweetText was too long. It must be 280 or less and it was ' + CAST(@LenTweetText AS varchar(20));
+	THROW 50000,@msg,1;
+ END
 
 DECLARE @TagUseCount int;
 DECLARE @MaxTagUseCount int;

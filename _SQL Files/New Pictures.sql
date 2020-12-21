@@ -23,7 +23,7 @@ FROM    FileAssets.PictureInvalidImage;
 
 SELECT *
 FROM   AssetsInterface.ThemeParkAsset
-WHERE  ThemeParkAsset.ThemeParkAssetHashtag LIKE '%BayLake%'
+WHERE  ThemeParkAsset.ThemeParkAssetHashtag LIKE '%Africa%'
 
 EXIT
 DECLARE @findTag varchar(100) = 'Frontierland'

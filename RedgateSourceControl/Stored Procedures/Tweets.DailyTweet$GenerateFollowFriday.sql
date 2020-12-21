@@ -6,7 +6,8 @@ GO
 
 
 
-CREATE    PROCEDURE [Tweets].[DailyTweet$GenerateFollowFriday]
+
+CREATE      PROCEDURE [Tweets].[DailyTweet$GenerateFollowFriday]
 (
 	@TweetDate date,
 	@AllowNonFridayDateFlag bit = 0,
@@ -106,12 +107,12 @@ DECLARE @position INT = 1, @TwitterAccountId int, @CurrentLength tinyint, @NewIt
 			
   END;
 
-  SELECT '--Position = ' + CAST(#holdAccountNames.position AS varchar(10))+ CHAR(13) + CHAR(10) + 'SET XACT_ABORT ON; BEGIN TRANSACTION;' + CHAR(13) + CHAR(10) + 'EXECUTE ' + DB_NAME() + '.Tweets.DailyTweet$Insert @TweetNumber = ' + CAST(#holdAccountNames.Position AS varchar(10)) + ', @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''FollowFriday'',' + CHAR(13) + CHAR(10) + '@TweetText = ''' + tools.[String$EscapeString](#holdMessages.messageText,DEFAULT,0) + ' ' +  STRING_AGG(TwitterAccount.TwitterHandle,' ') + ''''+ 
+  SELECT '--Position = ' + CAST(#holdAccountNames.position AS varchar(10))+ CHAR(13) + CHAR(10) + 'SET XACT_ABORT ON; BEGIN TRANSACTION;' + CHAR(13) + CHAR(10) + 'EXECUTE ' + DB_NAME() + '.Tweets.DailyTweet$Insert @TweetNumber = ' + CAST(#holdAccountNames.Position AS varchar(10)) + ', @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''{FollowFriday}'',' + CHAR(13) + CHAR(10) + '@TweetText = ''' + tools.[String$EscapeString](#holdMessages.messageText,DEFAULT,0) + ' ' +  STRING_AGG(TwitterAccount.TwitterHandle,' ') + ''''+ 
 	', @FollowFridayPrefixId = ' + CAST(#holdMessages.followFridayPrefixId AS char(10)) + CHAR(13) + CHAR(10) + 
 	', @FollowFridayList = ''' + STRING_AGG(TwitterAccount.TwitterHandle ,',') + '''' +CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 
 	
 	'EXEC ' + DB_NAME() + '.Tweets.DailyTweetPicture$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + 
-	''', @TweetTypeTag = ''FollowFriday'', @TweetNumber = ' + CAST(#holdAccountNames.position AS varchar(10)) + ',@PictureNumber =   ;' + 
+	''', @TweetTypeTag = ''{FollowFriday}'', @TweetNumber = ' + CAST(#holdAccountNames.position AS varchar(10)) + ',@PictureNumber =   ;' + 
 		 CHAR(13) + CHAR(10) + '--COMMIT' +CHAR(13) + CHAR(10)  +CHAR(13) + CHAR(10)  + '-------------------'  + CHAR(13) + CHAR(10)  
  
   FROM   #holdAccountNames

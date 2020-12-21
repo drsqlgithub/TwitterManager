@@ -2,21 +2,13 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
-
-
-
-
-
-
-
-	
-CREATE     PROCEDURE [Tweets].[DailyTweet$GenerateSpecial]
+CREATE   PROCEDURE [Tweets].[DailyTweet$GenerateSpecial]
 (
 	@TweetTypeTag varchar(30),
 	@TweetDate date = NULL,
 	@FileSampleCount int = 4,
-	@IncludeHolidayPicturesFlag bit = 0
+	@IncludeHolidayPicturesFlag bit = 0,
+	@TweetNumber int = 1
 )
 AS
 
@@ -45,9 +37,9 @@ BEGIN TRANSACTION;'
 
 --generate statements to get pictures and create the directories for the images
 SELECT '--#' + @TweetTypeTag + ' [--Topic], ' + 
-			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE ' + DB_NAME() + '.Tweets.DailyTweet$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''' + @TweetTypeTag  +  ''',' + CHAR(13) + CHAR(10) + '@TweetText = '' #' + REPLACE(REPLACE(@TweetTypeTag,'{',''),'}','') + ''';'
+			CHAR(13) + CHAR(10) + CHAR(13) + CHAR(10) + 'EXECUTE ' + DB_NAME() + '.Tweets.DailyTweet$Insert @TweetDate = ''' + CAST(@TweetDate AS varchar(30)) + ''' ,@TweetTypeTag = ''' + @TweetTypeTag  +  ''',' + CHAR(13) + CHAR(10) + '@TweetText = '' #' + REPLACE(REPLACE(@TweetTypeTag,'{',''),'}','') + ''', @TweetNumber =' + CAST(@TweetNumber AS varchar(30)) + ',  @OverrideDailyLimitFlag = 0;' --hardcoded to give you the choice at save time
 
-EXEC Tweets.DailyTweetPicture$GetRandomSpecial @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount, @TweetTypeTag = @TweetTypeTag, @IncludeHolidayPicturesFlag = @IncludeHolidayPicturesFlag
+EXEC Tweets.DailyTweetPicture$GetRandomSpecial @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount, @TweetTypeTag = @TweetTypeTag, @IncludeHolidayPicturesFlag = @IncludeHolidayPicturesFlag, @TweetNumber = @TweetNumber;
 
 SELECT '--COMMIT TRANSACTION;'
 

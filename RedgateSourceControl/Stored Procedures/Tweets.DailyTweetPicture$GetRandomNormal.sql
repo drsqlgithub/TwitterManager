@@ -5,7 +5,8 @@ GO
 
 
 
-CREATE    PROCEDURE [Tweets].[DailyTweetPicture$GetRandomNormal] 
+
+CREATE      PROCEDURE [Tweets].[DailyTweetPicture$GetRandomNormal] 
 (
 	@ThemeParkAssetId varchar(50),
 	@TweetDate date = NULL,
@@ -65,7 +66,7 @@ ORDER BY NEWID();
 
 
 
-SELECT CONCAT('EXEC Tweets.DailyTweetPicture$Insert @TweetDate = ''',@TweetDate,''', @TweetTypeTag = ''Normal'',@PictureNumber = ''',PictureDecoded.PictureNumber, '''')
+SELECT CONCAT('EXEC ' + DB_NAME() + '.Tweets.DailyTweetPicture$Insert @TweetDate = ''',@TweetDate,''', @TweetTypeTag = ''Normal'',@PictureNumber = ''',PictureDecoded.PictureNumber, '''')
 FROM  FileAssets.PicturePreview
 		JOIN FileAssets.PictureDecoded
 			ON PicturePreview.name = PictureDecoded.PhysicalFileName
