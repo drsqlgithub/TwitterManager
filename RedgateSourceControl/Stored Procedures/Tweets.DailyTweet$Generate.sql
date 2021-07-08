@@ -3,7 +3,8 @@ GO
 SET ANSI_NULLS ON
 GO
 
-CREATE    PROCEDURE [Tweets].[DailyTweet$Generate]
+
+CREATE     PROCEDURE [Tweets].[DailyTweet$Generate]
 (
 	@TweetDate date = NULL,
 	@FileSampleCount int = 10,
@@ -28,7 +29,7 @@ SELECT 'SET XACT_ABORT ON;
 BEGIN TRANSACTION;'
 
 DECLARE @ThemeParkAssetId int
-SET @ThemeParkAssetId = (SELECT ThemeParkAssetId FROM [Assets].[DailyTweet$GetRandom2](@TweetDate,@SpecialTagId,@AssetRepeatToleranceDayCount))
+SET @ThemeParkAssetId = (SELECT ThemeParkAssetId FROM [Assets].[DailyTweet$GetRandom](@TweetDate,@SpecialTagId,@AssetRepeatToleranceDayCount))
 
 SELECT TOP 10 '--' + CAST(DailyTweet.TweetDate AS varchar(20)) + ' ' + ThemeParkArea.ThemeParkAreaHashtag + ' ' + ThemeParkAsset.ThemeParkAssetHashtag AS '--Last 5 uses of this asset'
 FROM   Tweets.DailyTweet
