@@ -7,7 +7,10 @@ GO
 
 
 
-CREATE      PROCEDURE [Tweets].[DailyTweet$GenerateFollowFriday]
+
+
+
+CREATE    PROCEDURE [Tweets].[DailyTweet$GenerateFollowFriday]
 (
 	@TweetDate date,
 	@AllowNonFridayDateFlag bit = 0,
@@ -70,6 +73,7 @@ WHILE @I <= @NumberOfTweets
 DECLARE @position INT = 1, @TwitterAccountId int, @CurrentLength tinyint, @NewItemLength tinyint
  WHILE @position <= @NumberOfTweets
   BEGIN
+
 	SELECT TOP 1 @TwitterAccountId = TwitterAccount.TwitterAccountId
 	FROM   Assets.TwitterAccount
 			LEFT JOIN Tweets.FollowFriday
@@ -83,8 +87,9 @@ DECLARE @position INT = 1, @TwitterAccountId int, @CurrentLength tinyint, @NewIt
 		AND TwitterAccount.LockedFlag <> 1
 		AND TwitterAccount.FollowFridayFlag = 1
 		AND TwitterAccount.TwitterAccountId NOT IN (SELECT TwitterAccountId FROM #holdAccountNames)
-	ORDER BY TweetDate,NEWID()
-
+    GROUP BY TwitterAccount.TwitterAccountId
+	ORDER BY  COALESCE(MAX(DailyTweet.TweetDate),'1999-01-01') ASC,NEWID()
+	
 	SELECT @CurrentLength = SUM(LEN(TwitterAccount.TwitterHandle))
 	FROM  #holdAccountNames
 				JOIN Assets.TwitterAccount
@@ -123,9 +128,8 @@ DECLARE @position INT = 1, @TwitterAccountId int, @CurrentLength tinyint, @NewIt
   GROUP BY #holdMessages.messageText,#holdAccountNames.Position, #holdMessages.followFridayPrefixId
   ORDER BY #holdAccountNames.position
   
-  EXEC [Tweets].[DailyTweetPicture$GetRandomSpecial] @TweetTypeTag = '{FollowFriday}', @TweetDate = @TweetDate,@TweetNumber = 10
+  EXEC [Tweets].[DailyTweetPicture$GetRandomTag] @TweetTypeTag = '{FollowFriday}', @TweetDate = @TweetDate,@TweetNumber = 10
 	
-
 
 SELECT 'SELECT DailyTweet.TweetText
 FROM   ' + DB_NAME() + '.Tweets.DailyTweet

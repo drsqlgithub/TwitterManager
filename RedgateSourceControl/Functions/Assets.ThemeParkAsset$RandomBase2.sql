@@ -4,8 +4,7 @@ SET ANSI_NULLS ON
 GO
 
 
-
-CREATE     FUNCTION [Assets].[ThemeParkAsset$RandomBaseNormal](@DateValue date)
+CREATE    FUNCTION [Assets].[ThemeParkAsset$RandomBase2](@DateValue date, @SpecialTagId int, @AssetRepeatToleranceDayCount int)
 RETURNS table AS 
 RETURN(
 SELECT Value.ThemeParkAssetId,
@@ -17,16 +16,18 @@ FROM (
 				   0 AS StartingPopularityFactorBase,  
 				   PopularityFactor AS EndingPopularityFactorBase,
 				   ROW_NUMBER() OVER (ORDER BY ThemeParkAsset.ThemeParkAssetId) AS Bucket
-			FROM   Assets.ThemeParkAsset
+			FROM  [Assets].[ThemeParkAssetExpanded] AS ThemeParkAsset
 			WHERE EXISTS (SELECT *
 						  FROM  [Assets].[NonSpecialThemeParkAssetPictureCount]
-						  WHERE ThemeParkAsset.ThemeParkAssetId = [NonSpecialThemeParkAssetPictureCount].ThemeParkAssetId)) AS ItemsAdded
+						  WHERE ThemeParkAsset.ThemeParkAssetId = [NonSpecialThemeParkAssetPictureCount].ThemeParkAssetId)
+			  AND (ThemeParkAsset.SpecialTagId = @SpecialTagId OR (@SpecialTagId IS NULL AND SpecialTagId IS NULL)
+						  )) AS ItemsAdded
+			  
 	WHERE NOT EXISTS (SELECT *
 					  FROM   Tweets.DailyTweet	
 								JOIN Tweets.DailyTweetNormal
 									ON DailyTweetNormal.DailyTweetId = DailyTweet.DailyTweetId
-					  WHERE  DailyTweet.TweetDate > DATEADD(DAY,-30,@DateValue)
-					    AND  DailyTweetNormal.ThemeParkAssetId = ItemsAdded.ThemeParkAssetId)
-) AS Value
+					  WHERE  DailyTweet.TweetDate > DATEADD(DAY,-@AssetRepeatToleranceDayCount,@DateValue)
+					    AND  DailyTweetNormal.ThemeParkAssetId = ItemsAdded.ThemeParkAssetId) ) AS Value
 )
 GO

@@ -9,6 +9,11 @@ EXEC FileAssets.Picture$AddPictureNumber;
 
 
 EXIT
+
+--list files to fix
+SELECT *
+FROM    FileAssets.PictureInvalidImage;
+
 --copy files for fixing to the FixImages folder
 FileAssets.PictureInvalidImage$CopyToFix
 
@@ -16,14 +21,12 @@ EXIT
 Assets.Picture$MakeDetailsMatchFileAssets
 
 
---list files to fix
-SELECT *
-FROM    FileAssets.PictureInvalidImage;
 
 
 SELECT *
 FROM   AssetsInterface.ThemeParkAsset
-WHERE  ThemeParkAsset.ThemeParkAssetHashtag LIKE '%Africa%'
+WHERE  ThemeParkAsset.ThemeParkAssetHashtag LIKE '%beast%'
+
 
 EXIT
 DECLARE @findTag varchar(100) = 'Frontierland'

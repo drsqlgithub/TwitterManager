@@ -2,6 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
+
 CREATE   PROCEDURE [Assets].[Picture$MakeDetailsMatchFileAssets]
 (
 @ResetSequenceFlag bit = 0
@@ -112,12 +113,23 @@ IF @ResetSequenceFlag = 1
  BEGIN
 	DECLARE @i int = CAST((SUBSTRING((SELECT MAX(pictureNumber) FROM Assets.Picture),4,8)) AS int), @statement nvarchar(MAX) 
 	SET @i = COALESCE(@i + 1,1)
-	SET @statement = CONcAT('
+	SET @statement = CONCAT('
 	ALTER SEQUENCE [Assets].[PictureNumberSequence] 
 	RESTART WITH ',@i)
 	EXECUTE (@statement)
  END
+
+
+INSERT INTO Assets.WindowWednesdayTopicDetail(TagId)
+SELECT tagId
+FROM   Assets.Tag
+WHERE  tag LIKE '(WW%)'
+  AND  tagId NOT IN (SELECT tagId
+                     FROM   Assets.WindowWednesdayTopicDetail)
+
  COMMIT
+
+
 
 END;
 GO

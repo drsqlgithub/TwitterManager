@@ -76,3 +76,4 @@ FROM   Assets.Picture
 GROUP BY ThemeParkAreaHashtag,ThemeParkAssetHashtag
 ORDER BY 3 desc
 
+GO

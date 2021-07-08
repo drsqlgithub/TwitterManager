@@ -2,13 +2,17 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-CREATE        PROCEDURE [Tweets].[DailyTweetPicture$GetRandomSpecial] 
+
+
+
+CREATE     PROCEDURE [Tweets].[DailyTweetPicture$GetRandom] 
 (
-	@TweetTypeTag varchar(30),
+	@ThemeParkAssetId varchar(50),
 	@TweetDate date = NULL,
 	@FileSampleCount int = 10,
+	@SpecialTagId int = NULL,
 	@TweetNumber int = 1,
-	@IncludeHolidayPicturesFlag bit = 0
+	@FreshPicturesOnlyFlag bit = 0
 ) AS
 SET NOCOUNT ON
 IF @TweetDate IS NULL SET @TweetDate = SYSDATETIME();
@@ -43,29 +47,49 @@ SELECT TOP (@FileSampleCount) filePicture.stream_id,
                            filePicture.is_archive,
                            filePicture.is_system,
                            filePicture.is_temporary
-FROM   assets.specialPicture
-		 JOIN Assets.Picture
-			ON Picture.PictureId = SpecialPicture.PictureId
-		 JOIN FileAssets.PictureDecoded
+FROM   Assets.Picture
+		JOIN FileAssets.PictureDecoded
 			ON PictureDecoded.PictureNumber = Picture.PictureNumber
 		JOIN FileAssets.Picture AS filePicture
 			ON PictureDecoded.PhysicalFileName  = filePicture.Name
-WHERE  Picture.PictureId NOT IN (SELECT DailyTweetPicture.PictureId
+WHERE  
+    ( @FreshPicturesOnlyFlag = 0
+	OR filePicture.creation_time > DATEADD(DAY,-60,SYSDATETIME())
+   )
+AND 
+Picture.PictureId NOT IN (SELECT DailyTweetPicture.PictureId
 								 FROM Tweets.DailyTweetPicture
 										JOIN Tweets.DailyTweet
 											ON DailyTweet.DailyTweetId = DailyTweetPicture.DailyTweetId
 								 WHERE DailyTweet.TweetDate >= DATEADD(DAY,-60,SYSDATETIME()))
-  AND  (picture.PictureId NOT IN (SELECT PictureId --do not include holiday pictures in NORMAL searches
-								FROM   Assets.PictureTag
-										JOIN Assets.Tag
-											ON Tag.TagId = PictureTag.TagId
-								WHERE Tag.HolidayTag = 1) 
-			OR @IncludeHolidayPicturesFlag = 1)
+  AND  Picture.ThemeParkAssetId = @ThemeParkAssetId
+  AND ((@SpecialTagId IS NOT NULL
+        AND 
+		EXISTS (SELECT *
+					FROM  Assets.PictureTag
+					WHERE pictureTag.PictureId = Picture.PictureId
+					  AND tagId = @SpecialTagId)
+		)
+	OR (@SpecialTagId IS NULL
+        AND 
+		NOT EXISTS (SELECT *
+					FROM  Assets.PictureTag
+							JOIN Assets.Tag
+								ON Tag.TagId = PictureTag.TagId
+					WHERE pictureTag.PictureId = Picture.PictureId
+					   AND Tag.SpecialFlag = 1
+					  )
+		)
+		)
 
-  AND  SpecialPicture.SpecialTag = @TweetTypeTag 
+
 ORDER BY NEWID();
 
-SELECT CONCAT('EXEC ' + DB_NAME() + '.Tweets.DailyTweetPicture$Insert @TweetDate = ''',@TweetDate,''', @TweetTypeTag = ''' +  @TweetTypeTag + ''', @TweetNumber = ' + CAST(@TweetNumber AS varchar(10)) + ',@PictureNumber = ''',PictureDecoded.PictureNumber, '''',' --Pic Last Used ' + CAST(PicLastUsed.LastUsedDate AS char(10)))
+DECLARE @TweetType varchar(40) = COALESCE((SELECT Tag
+					FROM  Assets.Tag
+					WHERE tagId = @SpecialTagId),'Normal')
+
+SELECT CONCAT('EXEC ' + DB_NAME() + '.Tweets.DailyTweetPicture$Insert @TweetDate = ''',@TweetDate,''', @TweetTypeTag = ''' +  @TweetType + ''', @TweetNumber = ' + CAST(@TweetNumber AS varchar(10)) + ',@PictureNumber = ''',PictureDecoded.PictureNumber, '''',' --Pic Last Used ' + CAST(PicLastUsed.LastUsedDate AS char(10)))
 FROM  FileAssets.PicturePreview
 		JOIN FileAssets.PictureDecoded
 			ON PicturePreview.name = PictureDecoded.PhysicalFileName

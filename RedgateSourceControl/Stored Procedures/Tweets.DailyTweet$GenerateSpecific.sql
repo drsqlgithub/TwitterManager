@@ -11,7 +11,10 @@ GO
 
 
 
-CREATE   PROCEDURE [Tweets].[DailyTweet$GenerateSpecific]
+
+
+
+CREATE       PROCEDURE [Tweets].[DailyTweet$GenerateSpecific]
 (
 	@ThemeParkAreaHashtag varchar(100),
 	@ThemeParkAssetHashtag varchar(100),
@@ -24,7 +27,7 @@ SET NOCOUNT ON
 
 IF @TweetDate IS NULL SET @TweetDate = SYSDATETIME();
  
-SELECT 'SET XACT_ABORT ON; 
+SELECT 'SET XACT_ABORT ON; SET NOCOUNT ON;
 BEGIN TRANSACTION;'
 
 DECLARE @ThemeParkAssetId int
@@ -48,7 +51,7 @@ WHERE  ThemeParkAsset.ThemeParkAssetId = @ThemeParkAssetId
  AND   ThemeParkAsset.SpecialTagId IS NULL --This says the Asset is only for special events
 
 
-EXEC Tweets.DailyTweetPicture$GetRandomNormal @ThemeParkAssetId = @ThemeParkAssetId, @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount
+EXEC Tweets.DailyTweetPicture$GetRandom @ThemeParkAssetId = @ThemeParkAssetId, @TweetDate = @TweetDate, @FileSampleCount = @FileSampleCount
 
 SELECT '--COMMIT TRANSACTION;'
 

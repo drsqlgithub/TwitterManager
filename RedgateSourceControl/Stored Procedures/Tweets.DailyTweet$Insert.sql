@@ -5,7 +5,8 @@ GO
 
 
 
-CREATE        PROCEDURE [Tweets].[DailyTweet$Insert](
+
+CREATE    PROCEDURE [Tweets].[DailyTweet$Insert](
 	@TweetDate date,
 	@TweetTypeTag varchar(30),
 	@TweetText nvarchar(2000),
@@ -76,9 +77,9 @@ SELECT @DailyTweetId= (SELECT DailyTweetId
 IF @DailyTweetId IS NULL
 	THROW 50000,'@DailyTweetId IS NULL',1;
 
-IF @TweetTypeTag = 'Normal'
+IF @TweetTypeTag NOT IN ('FollowFriday','WindowWednesday','{WindowWednesday}','{FollowFriday}')
    BEGIN
-	IF @ThemeParkAssetId IS NULL
+	IF @ThemeParkAssetId IS NULL 
 		THROW 50000,'@ThemeParkAssetId is required for "Normal" TweetTagType',1;
 
 	INSERT INTO  Tweets.DailyTweetNormal(DailyTweetId, ThemeParkAssetId)
@@ -86,7 +87,7 @@ IF @TweetTypeTag = 'Normal'
 	       @ThemeParkAssetId  -- ThemeParkAssetId - int
 	    )
    END;
-ELSE IF @TweetTypeTag = 'FollowFriday'
+ELSE IF @TweetTypeTag = '{FollowFriday}'
  BEGIN
 	
 	INSERT INTO Tweets.DailyTweetFollowFriday(DailyTweetId, FollowFridayPrefixId)

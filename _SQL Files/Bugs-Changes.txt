@@ -1,0 +1,18 @@
+/* Bugs */
+
+--I saw PandoraArea just 3 days after last use for normal
+
+--I saw mainstreetelectrical parade in normal at all
+
+--2018_AnimalKingdom_KilimanjaroSafaris_Queue_PIC0021028.jpg is tagged TreeOfLife
+
+
+/* Changes */ 
+
+1. Add "FreshFiles" option to get only files in the past month
+2. Make sure it shows when picture last used
+
+3. Add area search using graph structure
+4. Moving a tweet that was put in the wrong day
+5. Remove PictureDetail
+6. Clean Up Tags
